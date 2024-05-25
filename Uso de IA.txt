@@ -1,0 +1,2 @@
+Uso de IA
+- Chat GPT en el activity Tareas para poder ingresar fecha y hora la fecha de vencimiento y los recordatorios.
