@@ -100,14 +100,8 @@ public class Formulario extends AppCompatActivity {
                 } else {
                     recordatorios.add(calendario.getTime());
                     int n = recordatorios.size();
-                    Toast.makeText(this, "Recordatorio añadido" + n, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Recordatorio añadido " + n, Toast.LENGTH_SHORT).show();
 
-                    /*
-                    Date fechaRecordatorio = calendario.getTime();
-                    recordatorios.add(fechaRecordatorio);
-                    mostrarRecordatorio(fechaRecordatorio);
-
-                     */
                 }
             }, calendario.get(Calendar.HOUR_OF_DAY), calendario.get(Calendar.MINUTE), true);
             timePickerDialog.show();
@@ -128,16 +122,13 @@ public class Formulario extends AppCompatActivity {
 
         Tarea tarea = new Tarea(titulo, descripcion, fecha);
         for (Date recordatorio : recordatorios) {
-//            int n = recordatorios.size() + 1;
             tarea.agregarRecordatorio(recordatorio);
-//            Toast.makeText(this, "Recordatorio añadido" + n, Toast.LENGTH_SHORT).show();
 
         }
 
-        // Añadir la nueva tarea al alumno
         alumno.agregarTarea(tarea);
 
-        // Guardar el alumno actualizado en el almacenamiento interno
+        /** Guardar el alumno actualizado **/
         try {
             guardarAlumnoEnStorage(alumno);
             Toast.makeText(this, "Tarea creada y guardada", Toast.LENGTH_SHORT).show();

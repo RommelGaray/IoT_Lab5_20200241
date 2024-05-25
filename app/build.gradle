@@ -6,6 +6,10 @@ android {
     namespace 'com.example.lab5_20200241'
     compileSdk 34
 
+    dataBinding {
+        enabled = true
+    }
+
     defaultConfig {
         applicationId "com.example.lab5_20200241"
         minSdk 31
