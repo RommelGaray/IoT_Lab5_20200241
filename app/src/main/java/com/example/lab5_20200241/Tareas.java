@@ -11,8 +11,11 @@ import com.example.lab5_20200241.databinding.ActivityTareasBinding;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class Tareas extends AppCompatActivity {
@@ -34,10 +37,35 @@ public class Tareas extends AppCompatActivity {
         String codigo = intent.getStringExtra("codigo");
 
 
-        /** IMPLEMENTAR EL RECYCLE VIEW **/
-        tareasAdapter = new TareasAdapter(alumno.getTareas());
+        // Configurar el RecyclerView
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        tareasAdapter = new TareasAdapter(alumno.getTareas());
         binding.recyclerView.setAdapter(tareasAdapter);
+
+
+
+        /** LECTURA DEL OBJETO **/
+        String fileName = codigo;
+        try (FileInputStream fileInputStream = openFileInput(fileName);
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+            Alumno alumno1 = (Alumno) objectInputStream.readObject();
+
+//            /** IMPLEMENTAR EL RECYCLE VIEW **/
+//            tareasAdapter = new TareasAdapter(alumno1.getTareas());
+//            binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//            binding.recyclerView.setAdapter(tareasAdapter);
+            tareasAdapter.notifyDataSetChanged(); // Notificar al adaptador que los datos han cambiado
+
+
+        } catch (FileNotFoundException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+
 
 
         /** AGREGAR NUEVA TAREA **/
@@ -53,6 +81,7 @@ public class Tareas extends AppCompatActivity {
 
 
     }
+
 
     public void guardarAlumno(Alumno alumno) throws IOException {
         String fileName = alumno.getCodigo();

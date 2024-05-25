@@ -3,15 +3,19 @@ package com.example.lab5_20200241;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.lab5_20200241.Entity.Alumno;
+import com.example.lab5_20200241.Entity.TareasAdapter;
 import com.example.lab5_20200241.databinding.ActivityMainBinding;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -38,13 +42,39 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                Alumno alumno;
-                try {
-                    alumno = cargarAlumno(codigo);
-                } catch (IOException | ClassNotFoundException e) {
-                    // Si no se puede cargar el alumno,e se asum que es un nuevo alumno
-                    alumno = new Alumno(codigo);
+                Alumno alumno = null;
+
+                String[] alumnosGuardados = fileList();
+                boolean alumnoEncontrado = false;
+
+                for(String alumno1: alumnosGuardados){
+                    Log.d("msg-datos", alumno1);
+
+                    if (alumno1.equals(codigo)){
+
+                        /** Leer el objeto **/
+                        try (FileInputStream fileInputStream = openFileInput(codigo);
+                             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+
+                            alumno = (Alumno) objectInputStream.readObject();
+                            alumnoEncontrado = true; // Marcar que el alumno fue encontrado
+                            break;
+
+                        } catch (FileNotFoundException | ClassNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }
+
                 }
+
+                if (!alumnoEncontrado) {
+                    alumno = new Alumno(codigo);
+                    Log.d("msg-datos", "Nuevo alumno creado");
+                }
+
 
                 Intent intent = new Intent(MainActivity.this, Tareas.class);
                 intent.putExtra("alumno", alumno);

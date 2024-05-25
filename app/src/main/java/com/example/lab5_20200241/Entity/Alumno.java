@@ -29,4 +29,12 @@ public class Alumno implements Serializable {
     public void setTareas(List<Tarea> tareas) {
         this.tareas = tareas;
     }
+
+    public void agregarTarea(Tarea tarea) {
+        tareas.add(tarea);
+    }
+
+    public void eliminarTarea(Tarea tarea) {
+        tareas.remove(tarea);
+    }
 }

@@ -40,11 +40,9 @@ public class Formulario extends AppCompatActivity {
 
         fechaVencimiento = Calendar.getInstance();
         recordatorios = new ArrayList<>();
-        dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        Alumno alumno;
 
         Intent intent = getIntent();
-        alumno = (Alumno) intent.getSerializableExtra("alumno");
+        Alumno alumno = (Alumno) intent.getSerializableExtra("alumno");
         String codigo = intent.getStringExtra("codigo");
 
         /** SELECCIONAR FECHA DE VENCIMIENTO **/
@@ -68,7 +66,11 @@ public class Formulario extends AppCompatActivity {
         binding.crear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                crearTarea();
+                crearYAgregarTarea(alumno);
+                Intent intent = new Intent(Formulario.this, Tareas.class);
+                intent.putExtra("alumno", alumno);
+                intent.putExtra("codigo", codigo);
+                startActivity(intent);
             }
         });
 
@@ -97,6 +99,9 @@ public class Formulario extends AppCompatActivity {
                     binding.fecha.setText(calendario.getTime().toString());
                 } else {
                     recordatorios.add(calendario.getTime());
+                    int n = recordatorios.size();
+                    Toast.makeText(this, "Recordatorio añadido" + n, Toast.LENGTH_SHORT).show();
+
                     /*
                     Date fechaRecordatorio = calendario.getTime();
                     recordatorios.add(fechaRecordatorio);
@@ -110,19 +115,9 @@ public class Formulario extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    /** MOSTRAR RECORDATORIO EN EL LAYOUT **/
-    /*
-    private void mostrarRecordatorio(Date fechaRecordatorio) {
-        TextView textView = new TextView(this);
-        textView.setText(dateFormat.format(fechaRecordatorio));
-        textView.setPadding(8, 8, 8, 8);
-        binding.recordatoriosLayout.addView(textView);
-    }
-     */
 
-
-    /** GUARDAR TAREA EN EL STORAGE **/
-    private void crearTarea() {
+    /** Crear y añadir una nueva tarea al alumno */
+    private void crearYAgregarTarea(Alumno alumno) {
         String titulo = binding.titulo.getText().toString();
         String descripcion = binding.descripcion.getText().toString();
         Date fecha = fechaVencimiento.getTime();
@@ -133,36 +128,35 @@ public class Formulario extends AppCompatActivity {
 
         Tarea tarea = new Tarea(titulo, descripcion, fecha);
         for (Date recordatorio : recordatorios) {
+//            int n = recordatorios.size() + 1;
             tarea.agregarRecordatorio(recordatorio);
+//            Toast.makeText(this, "Recordatorio añadido" + n, Toast.LENGTH_SHORT).show();
+
         }
 
-        Log.d("msg-datos", String.valueOf(recordatorios));
+        // Añadir la nueva tarea al alumno
+        alumno.agregarTarea(tarea);
 
-
-        /** QUIERO QUE LA TAREA SE GUARDE EN EL ALMACENAMIENTO INTERNO **/
-
+        // Guardar el alumno actualizado en el almacenamiento interno
         try {
-            guardarTarea(tarea);
+            guardarAlumnoEnStorage(alumno);
             Toast.makeText(this, "Tarea creada y guardada", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             Toast.makeText(this, "Error al guardar la tarea", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
+
         finish();
     }
 
-    private void guardarTarea(Tarea tarea) throws IOException {
-        // Nombre del archivo a guardar
-        String fileNameJson = "tareaObjeto";
 
-        // Se utiliza la clase FileOutputStream para poder almacenar en Android
-        try (FileOutputStream fileOutputStream = this.openFileOutput(fileNameJson, Context.MODE_PRIVATE);
+
+    /** Guardar el objeto Alumno en el almacenamiento interno */
+    private void guardarAlumnoEnStorage(Alumno alumno) throws IOException {
+        String fileName = alumno.getCodigo();
+        try (FileOutputStream fileOutputStream = this.openFileOutput(fileName, Context.MODE_PRIVATE);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
-            // Con objectOutputStream se realiza la escritura como objeto
-            objectOutputStream.writeObject(tarea);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e; // Lanzamos la excepción para manejarla en el método que llama
+            objectOutputStream.writeObject(alumno);
         }
     }
 

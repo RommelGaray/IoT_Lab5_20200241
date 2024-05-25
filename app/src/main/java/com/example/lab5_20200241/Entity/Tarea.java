@@ -23,7 +23,7 @@ public class Tarea implements Serializable {
         this.recordatorios.add(new Recordatorio(fechaRecordatorio));
     }
 
-    public static class Recordatorio {
+    public static class Recordatorio implements Serializable{
         private Date fechaRecordatorio;
 
         public Recordatorio(Date fechaRecordatorio) {
